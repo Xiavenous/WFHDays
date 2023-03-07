@@ -87,8 +87,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupTimeboxIterator() {
-        timeBoxWeekIterator =
-                new TimeBoxWeekIterator(firstMondayOfIterator, 0, 1);
+        timeBoxWeekIterator = new TimeBoxWeekIterator(firstMondayOfIterator);
         timeBoxWeekIterator.addWeekWfhDays(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
         timeBoxWeekIterator.addWeekWfhDays(Set.of(DayOfWeek.FRIDAY, DayOfWeek.THURSDAY));
     }
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (selectedDate.isBefore(firstMondayOfIterator) ||
                     selectedDate.isAfter(LocalDate.of(2023,12,31)))
-                throw new Exception("too early");
+                throw new Exception("Bad date");
 
             LocalDate mondayOfSelectedWeek = selectedDate
                     .minusDays(selectedDate.getDayOfWeek().getValue() - 1);

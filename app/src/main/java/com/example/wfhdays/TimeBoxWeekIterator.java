@@ -51,10 +51,8 @@ public class TimeBoxWeekIterator {
         }
     }
 
-    public TimeBoxWeekIterator(LocalDate inputMonday, int timeBoxWeek, int timeBoxNumber) throws DateTimeException {
+    public TimeBoxWeekIterator(LocalDate inputMonday) throws DateTimeException {
         if (inputMonday.getDayOfWeek() != DayOfWeek.MONDAY) throw new DateTimeException("Input date is not a \"Monday\"");
-        this.selectedTimeboxWeek = timeBoxWeek;
-        this.timeBoxNumber = timeBoxNumber;
         this.firstMonday = LocalDate.of(inputMonday.getYear(), inputMonday.getMonthValue(), inputMonday.getDayOfMonth());
         this.selectedMonday = LocalDate.of(inputMonday.getYear(), inputMonday.getMonthValue(), inputMonday.getDayOfMonth());
     }
