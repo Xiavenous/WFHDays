@@ -1,6 +1,8 @@
 package com.example.wfhdays;
 
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -9,28 +11,39 @@ import android.widget.TextView;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
+    private static final LocalDate firstMondayOfIterator =
+            LocalDate.of(2023,1,9);
     private static final Set<DayOfWeek> WEEKEND = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
-    private static final String IS_WEEKEND =  "is on a weekend.";
-    private static final String IS_WFH = "is a WFH day.";
-    private static final String NOT_WFH = "isn't a WFH day.";
+    private static final String IS_WEEKEND =  "is on a weekend";
+    private static final String IS_WFH = "is a WFH day";
+    private static final String NOT_WFH = "is an office day";
 
     private EditText dayText, monthText, yearText;
-    private List<View> prevWeekView;
-    private List<View> nextWeekView;
-    private List<View> selectedWeekView;
+    private List<TextView> prevWeekView;
+    private List<TextView> nextWeekView;
+    private List<TextView> selectedWeekView;
     private TextView output;
+    private TextView beginMonth;
+    private TextView endMonth;
 
     private TimeBoxWeekIterator timeBoxWeekIterator;
+    private GradientDrawable border;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        border = new GradientDrawable();
+        border.setShape(GradientDrawable.RECTANGLE);
+        border.setStroke(6, Color.BLACK);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         dayText = findViewById(R.id.editTextTextPersonName1);
@@ -40,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         yearText = findViewById(R.id.editTextTextPersonName3);
         yearText.setText(String.valueOf(LocalDate.now().getYear()));
         output = findViewById(R.id.textView);
+        beginMonth = findViewById(R.id.beginMonthTextView);
+        endMonth = findViewById(R.id.endMonthTextView);
         selectedWeekView = new ArrayList<>();
         selectedWeekView.add(findViewById(R.id.selectedWeekDay1));
         selectedWeekView.add(findViewById(R.id.selectedWeekDay2));
@@ -68,57 +83,104 @@ public class MainActivity extends AppCompatActivity {
 
         Button button = findViewById(R.id.button);
         button.setOnClickListener(this::onClick);
+        onClick(null);
     }
 
     private void setupTimeboxIterator() {
-        timeBoxWeekIterator = new TimeBoxWeekIterator(LocalDate.of(2023,1,9),
-                0, 1);
+        timeBoxWeekIterator =
+                new TimeBoxWeekIterator(firstMondayOfIterator, 0, 1);
         timeBoxWeekIterator.addWeekWfhDays(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
         timeBoxWeekIterator.addWeekWfhDays(Set.of(DayOfWeek.FRIDAY, DayOfWeek.THURSDAY));
     }
 
     private void onClick(View view) {
-        LocalDate selectedDate = LocalDate.of(
-                Integer.parseInt(yearText.getText().toString()),
-                Integer.parseInt(monthText.getText().toString()),
-                Integer.parseInt(dayText.getText().toString()));
+        try {
+            LocalDate selectedDate = LocalDate.of(
+                    Integer.parseInt(yearText.getText().toString()),
+                    Integer.parseInt(monthText.getText().toString()),
+                    Integer.parseInt(dayText.getText().toString()));
 
-        setVisualAid(selectedDate);
-        output.setText(String.format("%s %s", selectedDate, resolveResponse(selectedDate)));
+            if (selectedDate.isBefore(firstMondayOfIterator) ||
+                    selectedDate.isAfter(LocalDate.of(2023,12,31)))
+                throw new Exception("too early");
+
+            LocalDate mondayOfSelectedWeek = selectedDate
+                    .minusDays(selectedDate.getDayOfWeek().getValue() - 1);
+            LocalDate prevMonday = mondayOfSelectedWeek.minusWeeks(1);
+            LocalDate nextMonday = mondayOfSelectedWeek.plusWeeks(1);
+
+            updateVisualAid(selectedDate, mondayOfSelectedWeek, prevMonday, nextMonday);
+            updateTextViews(selectedDate, prevMonday, nextMonday);
+        } catch (Exception e) {
+            errorScenario();
+        }
     }
 
-    private void setVisualAid(LocalDate selectedDate) {
-        LocalDate thatMonday = selectedDate.minusDays(selectedDate.getDayOfWeek().getValue() - 1);
-        LocalDate prevMonday = thatMonday.minusWeeks(1);
-        LocalDate nextMonday = thatMonday.plusWeeks(1);
-
-        setOtherWeek(prevMonday, prevWeekView);
-        setSelectedWeek(selectedDate, thatMonday, selectedWeekView);
-        setOtherWeek(nextMonday, nextWeekView);
+    private void errorScenario() {
+        output.setText("INVALID INPUT!");
+        beginMonth.setText("");
+        endMonth.setText("");
+        prevWeekView.forEach(v -> {
+            v.setBackgroundColor(Color.WHITE);
+            v.setText("");
+        });
+        selectedWeekView.forEach(v -> {
+            v.setBackgroundColor(Color.WHITE);
+            v.setText("");
+        });
+        nextWeekView.forEach(v -> {
+            v.setBackgroundColor(Color.WHITE);
+            v.setText("");
+        });
     }
 
-    private void setSelectedWeek(LocalDate selectedDate, LocalDate thatMonday, List<View> selectedWeek) {
+    private void updateTextViews(LocalDate selectedDate, LocalDate prevMonday, LocalDate nextMonday) {
+        beginMonth.setText(prevMonday.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH));
+        endMonth.setText(resolveEndMonthText(prevMonday, nextMonday.plusDays(6)));
+        output.setText(resolveOutputText(selectedDate));
+    }
+
+    private String resolveOutputText(LocalDate selectedDate) {
+        return String.format(
+                "%s of %s %s",
+                dayWithPrefix(selectedDate.getDayOfMonth()),
+                selectedDate.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH),
+                resolveResponse(selectedDate));
+    }
+
+    private String resolveEndMonthText(LocalDate firstDay, LocalDate lastDay) {
+        return (firstDay.getMonth() != lastDay.getMonth())
+                ? lastDay.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+                : "";
+    }
+
+    private void updateVisualAid(LocalDate selectedDate, LocalDate mondayOfSelectedWeek,
+                                 LocalDate prevMonday, LocalDate nextMonday) {
+        setWeekView(prevMonday, prevWeekView);
+        setWeekView(mondayOfSelectedWeek, selectedWeekView);
+        setWeekView(nextMonday, nextWeekView);
+        setMarkerOnSelectedDate(selectedDate, mondayOfSelectedWeek);
+    }
+
+    private void setMarkerOnSelectedDate(LocalDate selectedDate, LocalDate mondayOfSelectedWeek) {
         for (int i = 0; i < 7; i++) {
-            if (thatMonday.plusDays(i).getDayOfWeek() == selectedDate.getDayOfWeek()) {
-                selectedWeek.get(i).setBackgroundColor(Color.GREEN);
-            } else if (timeBoxWeekIterator.isWfhDay(thatMonday.plusDays(i))) {
-                selectedWeek.get(i).setBackgroundColor(Color.parseColor("#2196F3"));
-            } else if (WEEKEND.contains(thatMonday.plusDays(i).getDayOfWeek())) {
-                selectedWeek.get(i).setBackgroundColor(Color.parseColor("#FF808080"));
-            } else {
-                selectedWeek.get(i).setBackgroundColor(Color.parseColor("#FFEB3B"));
+            if (mondayOfSelectedWeek.plusDays(i).getDayOfWeek() == selectedDate.getDayOfWeek()) {
+                border.setColor(
+                        ((ColorDrawable) selectedWeekView.get(i).getBackground()).getColor());
+                selectedWeekView.get(i).setBackground(border);
             }
         }
     }
 
-    private void setOtherWeek(LocalDate prevMonday, List<View> prevWeekView) {
+    private void setWeekView(LocalDate prevMonday, List<TextView> weekView) {
         for (int i = 0; i < 7; i++) {
+            weekView.get(i).setText(String.valueOf(prevMonday.plusDays(i).getDayOfMonth()));
             if (timeBoxWeekIterator.isWfhDay(prevMonday.plusDays(i))) {
-                prevWeekView.get(i).setBackgroundColor(Color.parseColor("#2196F3"));
+                weekView.get(i).setBackgroundColor(Color.parseColor("#2196F3"));
             } else if (WEEKEND.contains(prevMonday.plusDays(i).getDayOfWeek())) {
-                prevWeekView.get(i).setBackgroundColor(Color.parseColor("#FF808080"));
+                weekView.get(i).setBackgroundColor(Color.parseColor("#FF808080"));
             } else {
-                prevWeekView.get(i).setBackgroundColor(Color.parseColor("#FFEB3B"));
+                weekView.get(i).setBackgroundColor(Color.parseColor("#FFEB3B"));
             }
         }
     }
@@ -129,5 +191,14 @@ public class MainActivity extends AppCompatActivity {
         } else {
             return timeBoxWeekIterator.isWfhDay(input) ? IS_WFH : NOT_WFH;
         }
+    }
+
+    private String dayWithPrefix(int day) {
+        String input = String.valueOf(day);
+        if (input.endsWith("1")) return day + "st";
+        else if (input.endsWith("2")) return day + "nd";
+        else if (input.endsWith("3")) return day + "rd";
+
+        return day + "th";
     }
 }

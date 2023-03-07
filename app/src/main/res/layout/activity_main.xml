@@ -21,12 +21,12 @@
         android:id="@+id/editTextTextPersonName2"
         android:layout_width="112dp"
         android:layout_height="55dp"
-        android:layout_marginBottom="22dp"
+        android:layout_marginTop="80dp"
         android:ems="10"
         android:inputType="number"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <EditText
@@ -44,17 +44,39 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="50dp"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName2" />
+
+    <TextView
+        android:id="@+id/beginMonthTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="5dp"
+        android:text="January"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout1"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/endMonthTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="10dp"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
+        android:layout_marginTop="50dp"
+        android:text="Calculate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -63,74 +85,96 @@
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button">
 
-        <View
+        <TextView
             android:id="@+id/prevWeekDay1"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="1" />
 
-        <View
+        <TextView
             android:id="@+id/prevWeekDay2"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="2" />
 
-        <View
+        <TextView
             android:id="@+id/prevWeekDay3"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="3" />
 
-        <View
+        <TextView
             android:id="@+id/prevWeekDay4"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="4" />
 
-        <View
+        <TextView
             android:id="@+id/prevWeekDay5"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="5" />
 
-        <View
+        <TextView
             android:id="@+id/prevWeekDay6"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FF808080" />
+            android:textSize="14sp"
+            android:background="#FF808080"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="6" />
 
-        <View
+        <TextView
             android:id="@+id/prevWeekDay7"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FF808080" />
+            android:textSize="14sp"
+            android:background="#FF808080"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="7" />
 
     </LinearLayout>
 
@@ -145,68 +189,89 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout1">
 
-        <View
+        <TextView
             android:id="@+id/selectedWeekDay1"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="8" />
 
-        <View
+        <TextView
             android:id="@+id/selectedWeekDay2"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="9" />
 
-        <View
+        <TextView
             android:id="@+id/selectedWeekDay3"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="10" />
 
-        <View
+        <TextView
             android:id="@+id/selectedWeekDay4"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="11" />
 
-        <View
+        <TextView
             android:id="@+id/selectedWeekDay5"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="12" />
 
-        <View
+        <TextView
             android:id="@+id/selectedWeekDay6"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FF808080" />
+            android:textSize="14sp"
+            android:background="#FF808080"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="13" />
 
-        <View
+        <TextView
             android:id="@+id/selectedWeekDay7"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FF808080" />
+            android:textSize="14sp"
+            android:background="#FF808080"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="14" />
 
     </LinearLayout>
 
@@ -221,68 +286,89 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
-        <View
+        <TextView
             android:id="@+id/nextWeekDay1"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="15" />
 
-        <View
+        <TextView
             android:id="@+id/nextWeekDay2"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="16" />
 
-        <View
+        <TextView
             android:id="@+id/nextWeekDay3"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="17" />
 
-        <View
+        <TextView
             android:id="@+id/nextWeekDay4"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="18" />
 
-        <View
+        <TextView
             android:id="@+id/nextWeekDay5"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FFEB3B" />
+            android:textSize="14sp"
+            android:background="#FFEB3B"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="19" />
 
-        <View
+        <TextView
             android:id="@+id/nextWeekDay6"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FF808080" />
+            android:textSize="14sp"
+            android:background="#FF808080"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="20" />
 
-        <View
+        <TextView
             android:id="@+id/nextWeekDay7"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#FF808080" />
+            android:textSize="14sp"
+            android:background="#FF808080"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="21" />
 
     </LinearLayout>
 
