@@ -20,11 +20,6 @@ public class TimeBoxWeekIterator {
         numWeeks++;
     }
 
-    public void addWeekWfhDays() {
-        wfhDays.add(Set.of());
-        numWeeks++;
-    }
-
     public boolean isWfhDay(LocalDate inputDate) {
         while (!containsDate(inputDate)) nextTimeboxWeek();
         boolean isWfhDay = isWfhDay(inputDate.getDayOfWeek());
@@ -32,17 +27,17 @@ public class TimeBoxWeekIterator {
         return isWfhDay;
     }
 
-    public boolean isWfhDay(DayOfWeek dayOfWeek) {
+    private boolean isWfhDay(DayOfWeek dayOfWeek) {
         return wfhDays.get(selectedTimeboxWeek).contains(dayOfWeek);
     }
 
     public void resetIterator() {
-        selectedMonday = LocalDate.of(firstMonday.getYear(), firstMonday.getMonthValue(), firstMonday.getDayOfMonth());
+        selectedMonday = newLocalDateCopy(firstMonday);
         selectedTimeboxWeek = 0;
         timeBoxNumber = 1;
     }
 
-    public void nextTimeboxWeek() {
+    private void nextTimeboxWeek() {
         selectedMonday = selectedMonday.plusWeeks(1);
         selectedTimeboxWeek++;
         if (selectedTimeboxWeek == numWeeks) {
@@ -52,15 +47,21 @@ public class TimeBoxWeekIterator {
     }
 
     public TimeBoxWeekIterator(LocalDate inputMonday) throws DateTimeException {
-        if (inputMonday.getDayOfWeek() != DayOfWeek.MONDAY) throw new DateTimeException("Input date is not a \"Monday\"");
-        this.firstMonday = LocalDate.of(inputMonday.getYear(), inputMonday.getMonthValue(), inputMonday.getDayOfMonth());
-        this.selectedMonday = LocalDate.of(inputMonday.getYear(), inputMonday.getMonthValue(), inputMonday.getDayOfMonth());
+        if (inputMonday.getDayOfWeek() != DayOfWeek.MONDAY)
+            throw new DateTimeException("Input date is not a \"Monday\"");
+        this.firstMonday = newLocalDateCopy(inputMonday);
+        this.selectedMonday = newLocalDateCopy(inputMonday);
     }
 
-    public boolean containsDate(LocalDate other) {
+    private static LocalDate newLocalDateCopy(LocalDate date) {
+        return LocalDate.of(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+    }
+
+    private boolean containsDate(LocalDate other) {
         if (this.selectedMonday.isEqual(other)) return true;
 
-        return this.selectedMonday.isBefore(other) && this.selectedMonday.plusWeeks(1).isAfter(other);
+        return this.selectedMonday.isBefore(other) &&
+                this.selectedMonday.plusWeeks(1).isAfter(other);
     }
 
     public int getTimeBoxNumber() {
