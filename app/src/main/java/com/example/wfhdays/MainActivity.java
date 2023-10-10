@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String IS_WEEKEND =  "is on a weekend";
     private static final String IS_WFH = "is a WFH day";
     private static final String NOT_WFH = "is an office day";
+    private static final String INVALID_INPUT = "INVALID INPUT!";
 
     private EditText dayText, monthText, yearText;
     private List<TextView> prevWeekView;
@@ -47,11 +48,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         dayText = findViewById(R.id.editTextTextPersonName1);
-        dayText.setText(String.valueOf(LocalDate.now().getDayOfMonth()));
         monthText = findViewById(R.id.editTextTextPersonName2);
-        monthText.setText(String.valueOf(LocalDate.now().getMonthValue()));
         yearText = findViewById(R.id.editTextTextPersonName3);
-        yearText.setText(String.valueOf(LocalDate.now().getYear()));
         output = findViewById(R.id.textView);
         beginMonth = findViewById(R.id.beginMonthTextView);
         endMonth = findViewById(R.id.endMonthTextView);
@@ -79,11 +77,18 @@ public class MainActivity extends AppCompatActivity {
         nextWeekView.add(findViewById(R.id.nextWeekDay5));
         nextWeekView.add(findViewById(R.id.nextWeekDay6));
         nextWeekView.add(findViewById(R.id.nextWeekDay7));
+        setupInitialInputFieldValues(LocalDate.now());
         setupTimeboxIterator();
 
         Button button = findViewById(R.id.button);
         button.setOnClickListener(this::onClick);
         onClick(null);
+    }
+
+    private void setupInitialInputFieldValues(LocalDate initialInputDate) {
+        dayText.setText(String.valueOf(initialInputDate.getDayOfMonth()));
+        monthText.setText(String.valueOf(initialInputDate.getMonthValue()));
+        yearText.setText(String.valueOf(initialInputDate.getYear()));
     }
 
     private void setupTimeboxIterator() {
@@ -116,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void errorScenario() {
-        output.setText("INVALID INPUT!");
+        output.setText(INVALID_INPUT);
         beginMonth.setText("");
         endMonth.setText("");
         prevWeekView.forEach(v -> {
@@ -133,7 +138,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void updateTextViews(LocalDate selectedDate, LocalDate prevMonday, LocalDate nextMonday) {
+    private void updateTextViews(LocalDate selectedDate, LocalDate prevMonday,
+                                 LocalDate nextMonday) {
         beginMonth.setText(prevMonday.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH));
         endMonth.setText(resolveEndMonthText(prevMonday, nextMonday.plusDays(6)));
         output.setText(resolveOutputText(selectedDate));
@@ -174,29 +180,30 @@ public class MainActivity extends AppCompatActivity {
     private void setWeekView(LocalDate prevMonday, List<TextView> weekView) {
         for (int i = 0; i < 7; i++) {
             weekView.get(i).setText(String.valueOf(prevMonday.plusDays(i).getDayOfMonth()));
-            if (timeBoxWeekIterator.isWfhDay(prevMonday.plusDays(i))) {
-                weekView.get(i).setBackgroundColor(Color.parseColor("#2196F3"));
-            } else if (WEEKEND.contains(prevMonday.plusDays(i).getDayOfWeek())) {
-                weekView.get(i).setBackgroundColor(Color.parseColor("#FF808080"));
-            } else {
-                weekView.get(i).setBackgroundColor(Color.parseColor("#FFEB3B"));
-            }
+            weekView.get(i).setBackgroundColor(resolveWeekViewDayColour(prevMonday.plusDays(i)));
         }
+    }
+
+    private int resolveWeekViewDayColour(LocalDate day) {
+        if (timeBoxWeekIterator.isWfhDay(day))
+            return Color.parseColor("#2196F3");
+        else if (WEEKEND.contains(day.getDayOfWeek()))
+            return Color.parseColor("#FF808080");
+        else
+            return Color.parseColor("#FFEB3B");
     }
 
     private String resolveResponse(LocalDate input) {
-        if (Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY).contains(input.getDayOfWeek())) {
-            return IS_WEEKEND;
-        } else {
-            return timeBoxWeekIterator.isWfhDay(input) ? IS_WFH : NOT_WFH;
-        }
+        if (WEEKEND.contains(input.getDayOfWeek())) return IS_WEEKEND;
+        return timeBoxWeekIterator.isWfhDay(input) ? IS_WFH : NOT_WFH;
     }
 
     private String dayWithPrefix(int day) {
-        String input = String.valueOf(day);
-        if (input.endsWith("1")) return day + "st";
-        else if (input.endsWith("2")) return day + "nd";
-        else if (input.endsWith("3")) return day + "rd";
+        if (day >= 4 && day <= 20) return day + "th";
+
+        if (day % 10 == 1) return day + "st";
+        if (day % 10 == 2) return day + "nd";
+        if (day % 10 == 3) return day + "rd";
 
         return day + "th";
     }

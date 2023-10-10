@@ -13,7 +13,14 @@ public class TimeBoxWeekIterator {
     private int selectedTimeboxWeek = 0;
     private final LocalDate firstMonday;
     private LocalDate selectedMonday;
-    private List<Set<DayOfWeek>> wfhDays = new ArrayList<>();
+    private final List<Set<DayOfWeek>> wfhDays = new ArrayList<>();
+
+    public TimeBoxWeekIterator(LocalDate inputMonday) throws DateTimeException {
+        if (inputMonday.getDayOfWeek() != DayOfWeek.MONDAY)
+            throw new DateTimeException("Input date is not a \"Monday\"");
+        this.firstMonday = newLocalDateCopy(inputMonday);
+        this.selectedMonday = newLocalDateCopy(inputMonday);
+    }
 
     public void addWeekWfhDays(Set<DayOfWeek> wfhWeekDays) {
         wfhDays.add(wfhWeekDays);
@@ -37,6 +44,13 @@ public class TimeBoxWeekIterator {
         timeBoxNumber = 1;
     }
 
+    private boolean containsDate(LocalDate other) {
+        if (this.selectedMonday.isEqual(other)) return true;
+
+        return this.selectedMonday.isBefore(other) &&
+                this.selectedMonday.plusWeeks(1).isAfter(other);
+    }
+
     private void nextTimeboxWeek() {
         selectedMonday = selectedMonday.plusWeeks(1);
         selectedTimeboxWeek++;
@@ -46,22 +60,8 @@ public class TimeBoxWeekIterator {
         }
     }
 
-    public TimeBoxWeekIterator(LocalDate inputMonday) throws DateTimeException {
-        if (inputMonday.getDayOfWeek() != DayOfWeek.MONDAY)
-            throw new DateTimeException("Input date is not a \"Monday\"");
-        this.firstMonday = newLocalDateCopy(inputMonday);
-        this.selectedMonday = newLocalDateCopy(inputMonday);
-    }
-
     private static LocalDate newLocalDateCopy(LocalDate date) {
         return LocalDate.of(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-    }
-
-    private boolean containsDate(LocalDate other) {
-        if (this.selectedMonday.isEqual(other)) return true;
-
-        return this.selectedMonday.isBefore(other) &&
-                this.selectedMonday.plusWeeks(1).isAfter(other);
     }
 
     public int getTimeBoxNumber() {
