@@ -80,9 +80,13 @@ public class MainActivity extends AppCompatActivity {
         setupInitialInputFieldValues(LocalDate.now());
         setupTimeboxIterator();
 
-        Button button = findViewById(R.id.button);
-        button.setOnClickListener(this::onClick);
-        onClick(null);
+        Button caclulateButton = findViewById(R.id.button);
+        caclulateButton.setOnClickListener(this::onClickCalculate);
+
+        Button configButton = findViewById(R.id.configButton);
+        configButton.setOnClickListener(v -> onClickConfig());
+
+        onClickCalculate(null);
     }
 
     private void setupInitialInputFieldValues(LocalDate initialInputDate) {
@@ -97,7 +101,12 @@ public class MainActivity extends AppCompatActivity {
         timeBoxWeekIterator.addWeekWfhDays(Set.of(DayOfWeek.FRIDAY, DayOfWeek.THURSDAY));
     }
 
-    private void onClick(View view) {
+    private void onClickConfig() {
+        ConfigDialog dialog = new ConfigDialog();
+        dialog.show(getSupportFragmentManager(), "testing dialog");
+    }
+
+    private void onClickCalculate(View view) {
         try {
             LocalDate selectedDate = LocalDate.of(
                     Integer.parseInt(yearText.getText().toString()),
