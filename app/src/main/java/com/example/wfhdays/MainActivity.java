@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
@@ -85,6 +86,13 @@ public class MainActivity extends AppCompatActivity {
 
         Button configButton = findViewById(R.id.configButton);
         configButton.setOnClickListener(v -> onClickConfig());
+
+        File path = getApplicationContext().getFilesDir();
+        File readFrom = new File(path, "config.txt");
+        if (readFrom.length() == 0) {
+            onClickConfig();
+        }
+        System.out.println("Content size: " + readFrom.length());
 
         onClickCalculate(null);
     }
