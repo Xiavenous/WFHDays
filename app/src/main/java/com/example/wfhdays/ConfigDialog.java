@@ -2,6 +2,7 @@ package com.example.wfhdays;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ public class ConfigDialog extends AppCompatDialogFragment {
 
     private List<Switch> week1;
     private List<Switch> week2;
+    private ConfigDialogListener listener;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -43,6 +45,16 @@ public class ConfigDialog extends AppCompatDialogFragment {
 
 
         return builder.create();
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            listener = (ConfigDialogListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context + "must implement DialogConfigListener");
+        }
     }
 
     private String readFromFile() {
@@ -90,5 +102,9 @@ public class ConfigDialog extends AppCompatDialogFragment {
         week2.add(view.findViewById(R.id.switch8));
         week2.add(view.findViewById(R.id.switch9));
         week2.add(view.findViewById(R.id.switch10));
+    }
+
+    public interface ConfigDialogListener {
+        void applySelectedConfig(List<Boolean> week1, List<Boolean> week2);
     }
 }

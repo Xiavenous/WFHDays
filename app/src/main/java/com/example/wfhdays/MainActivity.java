@@ -21,7 +21,7 @@ import java.util.Set;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ConfigDialog.ConfigDialogListener {
     private static final LocalDate firstMondayOfIterator =
             LocalDate.of(2023,1,9);
     private static final Set<DayOfWeek> WEEKEND = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
@@ -227,5 +227,19 @@ public class MainActivity extends AppCompatActivity {
         if (day % 10 == 3) return day + "rd";
 
         return day + "th";
+    }
+
+    @Override
+    public void applySelectedConfig(List<Boolean> week1, List<Boolean> week2) {
+        Set<DayOfWeek> wfhDaysWeek1 = new HashSet<>();
+        for (int i = 0; i < 5; i++) {
+            if (week1.get(i)) wfhDaysWeek1.add(DayOfWeek.of(i + 1));
+        }
+        Set<DayOfWeek> wfhDaysWeek2 = new HashSet<>();
+        for (int i = 0; i < 5; i++) {
+            if (week2.get(i)) wfhDaysWeek2.add(DayOfWeek.of(i + 1));
+        }
+        setupTimeboxIterator(wfhDaysWeek1, wfhDaysWeek2);
+        onClickCalculate(null);
     }
 }
