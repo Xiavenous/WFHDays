@@ -14,6 +14,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -79,7 +80,10 @@ public class MainActivity extends AppCompatActivity {
         nextWeekView.add(findViewById(R.id.nextWeekDay6));
         nextWeekView.add(findViewById(R.id.nextWeekDay7));
         setupInitialInputFieldValues(LocalDate.now());
-        setupTimeboxIterator();
+        setupTimeboxIterator(
+                Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY),
+                Set.of(DayOfWeek.FRIDAY, DayOfWeek.THURSDAY)
+        );
 
         Button caclulateButton = findViewById(R.id.button);
         caclulateButton.setOnClickListener(this::onClickCalculate);
@@ -103,10 +107,10 @@ public class MainActivity extends AppCompatActivity {
         yearText.setText(String.valueOf(initialInputDate.getYear()));
     }
 
-    private void setupTimeboxIterator() {
+    private void setupTimeboxIterator(Set<DayOfWeek> wfhDaysWeek1, Set<DayOfWeek> wfhDaysWeek2) {
         timeBoxWeekIterator = new TimeBoxWeekIterator(firstMondayOfIterator);
-        timeBoxWeekIterator.addWeekWfhDays(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
-        timeBoxWeekIterator.addWeekWfhDays(Set.of(DayOfWeek.FRIDAY, DayOfWeek.THURSDAY));
+        timeBoxWeekIterator.addWeekWfhDays(wfhDaysWeek1);
+        timeBoxWeekIterator.addWeekWfhDays(wfhDaysWeek2);
     }
 
     private void onClickConfig() {
