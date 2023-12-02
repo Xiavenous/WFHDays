@@ -16,10 +16,12 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -113,16 +115,17 @@ public class MainActivity extends AppCompatActivity implements ConfigDialog.Conf
         return convertFileContentsToWfhDays(value);
     }
 
-    private static List<Set<DayOfWeek>> convertFileContentsToWfhDays(String value) {
-        Set<DayOfWeek> week1 = new HashSet<>();
-        for (int i = 0; i < 5; i++) {
-            if (value.charAt(i) == 'T') week1.add(DayOfWeek.of(i+1));
-        }
-        Set<DayOfWeek> week2 = new HashSet<>();
-        for (int i = 6; i < 11; i++) {
-            if (value.charAt(i) == 'T') week2.add(DayOfWeek.of(i-5));
-        }
-        return List.of(week1, week2);
+    private static List<Set<DayOfWeek>> convertFileContentsToWfhDays(final String value) {
+        return Arrays.stream(value.split("\n"))
+                .map(MainActivity::deserializeWfhDays)
+                .collect(Collectors.toList());
+    }
+
+    private static Set<DayOfWeek> deserializeWfhDays(String valueSubset) {
+        return Arrays.stream(DayOfWeek.values())
+                .filter(dow -> !WEEKEND.contains(dow))
+                .filter(dow -> valueSubset.charAt(dow.getValue() - 1) == 'T')
+                .collect(Collectors.toSet());
     }
 
     private static String readFileContents(File readFrom) {
