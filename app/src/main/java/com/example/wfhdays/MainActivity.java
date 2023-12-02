@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
@@ -25,6 +27,10 @@ public class MainActivity extends AppCompatActivity implements ConfigDialog.Conf
     private static final LocalDate firstMondayOfIterator =
             LocalDate.of(2023,1,9);
     private static final Set<DayOfWeek> WEEKEND = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
+    private static final List<Set<DayOfWeek>> DEFAULT_WFH_DAYS = List.of(
+            Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY),
+            Set.of(DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
+    );
     private static final String IS_WEEKEND =  "is on a weekend";
     private static final String IS_WFH = "is a WFH day";
     private static final String NOT_WFH = "is an office day";
@@ -80,10 +86,6 @@ public class MainActivity extends AppCompatActivity implements ConfigDialog.Conf
         nextWeekView.add(findViewById(R.id.nextWeekDay6));
         nextWeekView.add(findViewById(R.id.nextWeekDay7));
         setupInitialInputFieldValues(LocalDate.now());
-        setupTimeboxIterator(
-                Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY),
-                Set.of(DayOfWeek.FRIDAY, DayOfWeek.THURSDAY)
-        );
 
         Button caclulateButton = findViewById(R.id.button);
         caclulateButton.setOnClickListener(this::onClickCalculate);
@@ -93,12 +95,44 @@ public class MainActivity extends AppCompatActivity implements ConfigDialog.Conf
 
         File path = getApplicationContext().getFilesDir();
         File readFrom = new File(path, "config.txt");
-        if (readFrom.length() == 0) {
-            onClickConfig();
-        }
-        System.out.println("Content size: " + readFrom.length());
+        boolean configSaved = readFrom.length() > 0;
+
+        List<Set<DayOfWeek>> wfhDays = configSaved
+                ? loadWfhDaysFromFile(readFrom)
+                : DEFAULT_WFH_DAYS;
+
+        setupTimeboxIterator(wfhDays);
+
+        if (!configSaved) onClickConfig();
 
         onClickCalculate(null);
+    }
+
+    private static List<Set<DayOfWeek>> loadWfhDaysFromFile(File readFrom) {
+        String value = readFileContents(readFrom);
+        return convertFileContentsToWfhDays(value);
+    }
+
+    private static List<Set<DayOfWeek>> convertFileContentsToWfhDays(String value) {
+        Set<DayOfWeek> week1 = new HashSet<>();
+        for (int i = 0; i < 5; i++) {
+            if (value.charAt(i) == 'T') week1.add(DayOfWeek.of(i+1));
+        }
+        Set<DayOfWeek> week2 = new HashSet<>();
+        for (int i = 6; i < 11; i++) {
+            if (value.charAt(i) == 'T') week2.add(DayOfWeek.of(i-5));
+        }
+        return List.of(week1, week2);
+    }
+
+    private static String readFileContents(File readFrom) {
+        byte[] content = new byte[(int) readFrom.length()];
+        try (FileInputStream stream = new FileInputStream(readFrom)) {
+            stream.read(content);
+            return new String(content);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void setupInitialInputFieldValues(LocalDate initialInputDate) {
@@ -107,10 +141,9 @@ public class MainActivity extends AppCompatActivity implements ConfigDialog.Conf
         yearText.setText(String.valueOf(initialInputDate.getYear()));
     }
 
-    private void setupTimeboxIterator(Set<DayOfWeek> wfhDaysWeek1, Set<DayOfWeek> wfhDaysWeek2) {
+    private void setupTimeboxIterator(List<Set<DayOfWeek>> wfhDays) {
         timeBoxWeekIterator = new TimeBoxWeekIterator(firstMondayOfIterator);
-        timeBoxWeekIterator.addWeekWfhDays(wfhDaysWeek1);
-        timeBoxWeekIterator.addWeekWfhDays(wfhDaysWeek2);
+        wfhDays.forEach(timeBoxWeekIterator::addWeekWfhDays);
     }
 
     private void onClickConfig() {
@@ -239,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements ConfigDialog.Conf
         for (int i = 0; i < 5; i++) {
             if (week2.get(i)) wfhDaysWeek2.add(DayOfWeek.of(i + 1));
         }
-        setupTimeboxIterator(wfhDaysWeek1, wfhDaysWeek2);
+        setupTimeboxIterator(List.of(wfhDaysWeek1, wfhDaysWeek2));
         onClickCalculate(null);
     }
 }

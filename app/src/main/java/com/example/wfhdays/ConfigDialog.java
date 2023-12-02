@@ -6,15 +6,19 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 public class ConfigDialog extends AppCompatDialogFragment {
@@ -23,6 +27,7 @@ public class ConfigDialog extends AppCompatDialogFragment {
     private List<Switch> week2;
     private ConfigDialogListener listener;
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -39,8 +44,11 @@ public class ConfigDialog extends AppCompatDialogFragment {
                         (dialog, which) -> {
                             System.out.println("'Ok' clicked!");
                             writeToFile();
-                            System.out.println("Content written and read:");
-                            System.out.println(readFromFile());
+                            List<Boolean> var1 = week1.stream()
+                                    .map(CompoundButton::isChecked).collect(Collectors.toList());
+                            List<Boolean> var2 = week2.stream()
+                                    .map(CompoundButton::isChecked).collect(Collectors.toList());
+                            listener.applySelectedConfig(var1, var2);
                         });
 
 
@@ -57,18 +65,19 @@ public class ConfigDialog extends AppCompatDialogFragment {
         }
     }
 
+    /**
+     * Method could be used to initialise the checkboxes to the current config (or default)
+     * */
     private String readFromFile() {
         File path = requireContext().getFilesDir();
         File readFrom = new File(path, "config.txt");
         byte[] content = new byte[(int) readFrom.length()];
-        try {
-            FileInputStream stream = new FileInputStream(readFrom);
+        try (FileInputStream stream = new FileInputStream(readFrom)) {
             stream.read(content);
-            return new String(content);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return e.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        return new String(content);
     }
 
     private void writeToFile() {
