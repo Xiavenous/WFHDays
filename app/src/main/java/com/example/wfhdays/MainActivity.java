@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -29,6 +28,9 @@ public class MainActivity extends AppCompatActivity implements ConfigDialog.Conf
     private static final LocalDate firstMondayOfIterator =
             LocalDate.of(2023,1,9);
     private static final Set<DayOfWeek> WEEKEND = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
+    private static final Set<DayOfWeek> WEEKDAYS = Arrays.stream(DayOfWeek.values())
+            .filter(dow -> !WEEKEND.contains(dow))
+            .collect(Collectors.toSet());
     private static final List<Set<DayOfWeek>> DEFAULT_WFH_DAYS = List.of(
             Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY),
             Set.of(DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
@@ -122,8 +124,7 @@ public class MainActivity extends AppCompatActivity implements ConfigDialog.Conf
     }
 
     private static Set<DayOfWeek> deserializeWfhDays(String valueSubset) {
-        return Arrays.stream(DayOfWeek.values())
-                .filter(dow -> !WEEKEND.contains(dow))
+        return WEEKDAYS.stream()
                 .filter(dow -> valueSubset.charAt(dow.getValue() - 1) == 'T')
                 .collect(Collectors.toSet());
     }
@@ -267,15 +268,15 @@ public class MainActivity extends AppCompatActivity implements ConfigDialog.Conf
 
     @Override
     public void applySelectedConfig(List<Boolean> week1, List<Boolean> week2) {
-        Set<DayOfWeek> wfhDaysWeek1 = new HashSet<>();
-        for (int i = 0; i < 5; i++) {
-            if (week1.get(i)) wfhDaysWeek1.add(DayOfWeek.of(i + 1));
-        }
-        Set<DayOfWeek> wfhDaysWeek2 = new HashSet<>();
-        for (int i = 0; i < 5; i++) {
-            if (week2.get(i)) wfhDaysWeek2.add(DayOfWeek.of(i + 1));
-        }
+        Set<DayOfWeek> wfhDaysWeek1 = convertBooleanListToDayOfWeekSet(week1);
+        Set<DayOfWeek> wfhDaysWeek2 = convertBooleanListToDayOfWeekSet(week2);
         setupTimeboxIterator(List.of(wfhDaysWeek1, wfhDaysWeek2));
         onClickCalculate(null);
+    }
+
+    private Set<DayOfWeek> convertBooleanListToDayOfWeekSet(List<Boolean> week) {
+        return WEEKDAYS.stream()
+                .filter(dow -> week.get(dow.getValue() - 1))
+                .collect(Collectors.toSet());
     }
 }
