@@ -43,7 +43,7 @@ public class ConfigDialog extends AppCompatDialogFragment {
                 .setPositiveButton("Ok",
                         (dialog, which) -> {
                             System.out.println("'Ok' clicked!");
-                            writeToFile();
+                            writeConfigStateToFile();
                             List<Boolean> var1 = week1.stream()
                                     .map(CompoundButton::isChecked).collect(Collectors.toList());
                             List<Boolean> var2 = week2.stream()
@@ -80,21 +80,24 @@ public class ConfigDialog extends AppCompatDialogFragment {
         return new String(content);
     }
 
-    private void writeToFile() {
-        StringBuilder sb = new StringBuilder();
-        week1.forEach(s -> sb.append(s.isChecked() ? "T" : "F"));
-        sb.append("\n");
-        week2.forEach(s -> sb.append(s.isChecked() ? "T" : "F"));
-        String content = sb.toString();
+    private void writeConfigStateToFile() {
         File path = requireContext().getFilesDir();
         try {
             FileOutputStream writer = new FileOutputStream(new File(path, "config.txt"));
-            writer.write(content.getBytes());
+            writer.write(serializeWfhDays().getBytes());
             writer.close();
             Toast.makeText(requireContext(), "Wrote to file", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String serializeWfhDays() {
+        return serializeWeek(week1) + "\n" + serializeWeek(week2);
+    }
+
+    private String serializeWeek(List<Switch> week) {
+        return week.stream().map(s -> s.isChecked() ? "T" : "F").collect(Collectors.joining());
     }
 
     private void instantiateElements(View view) {
